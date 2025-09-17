@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfit Recommendation - Traditional Indian Outfits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f8f4e6 0%, #fff9e6 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #6a1b9a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(106, 27, 154, 0.3);
+        }
+
+        .back-btn:hover {
+            background: #4a148c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(106, 27, 154, 0.3);
+        }
+
+        .header h1 {
+            color: #6a1b9a;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .filters-title {
+            color: #6a1b9a;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #6a1b9a;
+            margin-bottom: 8px;
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #9c27b0;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .filter-select:focus {
+            border-color: #6a1b9a;
+            box-shadow: 0 0 10px rgba(106, 27, 154, 0.3);
+        }
+
+        .recommend-btn {
+            background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto 0;
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+        }
+
+        .recommend-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(106, 27, 154, 0.4);
+        }
+
+        .recommendations-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            color: #6a1b9a;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .outfit-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .outfit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(106, 27, 154, 0.2);
+        }
+
+        .outfit-image-container {
+            height: 300px;
+            background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .outfit-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .outfit-emoji {
+            font-size: 8rem;
+            opacity: 0.8;
+        }
+
+        .outfit-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .outfit-content {
+            padding: 25px;
+        }
+
+        .outfit-name {
+            color: #6a1b9a;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .outfit-state {
+            color: #9c27b0;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .outfit-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .outfit-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .tag.festival { background: #e91e63; }
+        .tag.wedding { background: #f44336; }
+        .tag.casual { background: #4caf50; }
+        .tag.formal { background: #2196f3; }
+        .tag.traditional { background: #ff9800; }
+
+        .sparkle-text {
+            color: #9c27b0;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .try-outfit-btn {
+            background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .try-outfit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+        }
+
+        .no-recommendations {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            display: none;
+        }
+
+        .no-recommendations.show {
+            display: block;
+        }
+
+        .no-recommendations h3 {
+            color: #6a1b9a;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6a1b9a;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recommendations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                ← Back to Home
+            </a>
+            <h1>
+                <span class="header-icon">🎯</span>
+                Outfit Recommendation
+            </h1>
+            <p>Get personalized traditional outfit recommendations based on your preferences and occasion</p>
+        </div>
+
+        <div class="filters-section">
+            <h2 class="filters-title">Tell us your preferences</h2>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Gender</label>
+                    <select class="filter-select" id="genderFilter">
+                        <option value="">Select Gender</option>
+                        <option value="men">Men</option>
+                        <option value="women">Women</option>
+                        <option value="boy">Boy</option>
+                        <option value="girl">Girl</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Occasion</label>
+                    <select class="filter-select" id="occasionFilter">
+                        <option value="">Select Occasion</option>
+                        <option value="festival">Festival</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="casual">Casual</option>
+                        <option value="formal">Formal</option>
+                        <option value="traditional">Traditional Ceremony</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Region Preference</label>
+                    <select class="filter-select" id="regionFilter">
+                        <option value="">Any Region</option>
+                        <option value="North India">North India</option>
+                        <option value="South India">South India</option>
+                        <option value="West India">West India</option>
+                        <option value="East India">East India</option>
+                        <option value="Northeast India">Northeast India</option>
+                        <option value="Central India">Central India</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Season</label>
+                    <select class="filter-select" id="seasonFilter">
+                        <option value="">Any Season</option>
+                        <option value="summer">Summer</option>
+                        <option value="winter">Winter</option>
+                        <option value="monsoon">Monsoon</option>
+                        <option value="spring">Spring</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="recommend-btn" onclick="getRecommendations()">
+                Get My Recommendations ✨
+            </button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Finding perfect outfits for you...</p>
+        </div>
+
+        <div class="recommendations-section" id="recommendationsSection" style="display: none;">
+            <h2 class="section-title">Recommended Outfits for You</h2>
+            <div class="recommendations-grid" id="recommendationsGrid">
+                <!-- Recommendations will be populated here -->
+            </div>
+        </div>
+
+        <div class="no-recommendations" id="noRecommendations">
+            <h3>No recommendations found</h3>
+            <p>Please adjust your filters and try again</p>
+        </div>
+    </div>
+
+    <script>
+        // Sample outfit data with recommendations
+        const outfitDatabase = [
+            // Festival Outfits
+            {
+                name: "Designer Salwar Kameez",
+                state: "Punjab",
+                region: "North India",
+                description: "Elegant embroidered suit perfect for festivals with intricate mirror work and vibrant colors.",
+                image: "👗",
+                genders: ["women", "girl"],
+                occasions: ["festival", "wedding", "traditional"],
+                season: ["winter", "spring"],
+                sparkleText: "Sparkle with ethnic charm!",
+                tags: ["festival", "traditional"]
+            },
+            {
+                name: "Royal Sherwani",
+                state: "Rajasthan",
+                region: "West India",
+                description: "Majestic royal sherwani with golden embroidery, perfect for grand celebrations.",
+                image: "🤴",
+                genders: ["men", "boy"],
+                occasions: ["wedding", "festival", "formal"],
+                season: ["winter", "spring"],
+                sparkleText: "Rule like a king!",
+                tags: ["wedding", "formal"]
+            },
+            {
+                name: "Bandhani Lehenga",
+                state: "Gujarat",
+                region: "West India",
+                description: "Traditional tie-dye lehenga with mirror work, perfect for Navratri and festivals.",
+                image: "👗",
+                genders: ["women", "girl"],
+                occasions: ["festival", "traditional"],
+                season: ["summer", "winter"],
+                sparkleText: "Dance your heart out!",
+                tags: ["festival", "traditional"]
+            },
+            {
+                name: "Kanchipuram Silk Saree",
+                state: "Tamil Nadu",
+                region: "South India",
+                description: "Pure silk saree with golden zari work, epitome of South Indian elegance.",
+                image: "🥻",
+                genders: ["women", "girl"],
+                occasions: ["wedding", "festival", "formal"],
+                season: ["winter", "spring"],
+                sparkleText: "Timeless elegance!",
+                tags: ["wedding", "traditional"]
+            },
+            {
+                name: "Dhoti Kurta Set",
+                state: "Maharashtra",
+                region: "West India",
+                description: "Traditional cotton dhoti with embroidered kurta, perfect for cultural events.",
+                image: "👔",
+                genders: ["men", "boy"],
+                occasions: ["festival", "traditional", "casual"],
+                season: ["summer", "monsoon"],
+                sparkleText: "Stay cool and traditional!",
+                tags: ["traditional", "casual"]
+            },
+            {
+                name: "Assamese Mekhela Chadar",
+                state: "Assam",
+                region: "Northeast India",
+                description: "Traditional silk two-piece with intricate Assamese motifs.",
+                image: "🥻",
+                genders: ["women", "girl"],
+                occasions: ["festival", "traditional", "formal"],
+                season: ["winter", "spring"],
+                sparkleText: "Grace of the Northeast!",
+                tags: ["traditional", "formal"]
+            },
+            {
+                name: "Kasavu Saree",
+                state: "Kerala",
+                region: "South India",
+                description: "Elegant cream saree with golden border, perfect for Onam and weddings.",
+                image: "🥻",
+                genders: ["women", "girl"],
+                occasions: ["festival", "wedding", "traditional"],
+                season: ["summer", "monsoon"],
+                sparkleText: "Kerala's golden beauty!",
+                tags: ["festival", "wedding"]
+            },
+            {
+                name: "Punjabi Kurta Pajama",
+                state: "Punjab",
+                region: "North India",
+                description: "Comfortable cotton kurta with colorful turban, ideal for casual and festive wear.",
+                image: "👳",
+                genders: ["men", "boy"],
+                occasions: ["festival", "casual", "traditional"],
+                season: ["summer", "spring"],
+                sparkleText: "Punjabi swag!",
+                tags: ["festival", "casual"]
+            },
+            {
+                name: "Bengali Tant Saree",
+                state: "West Bengal",
+                region: "East India",
+                description: "Handwoven cotton saree with traditional Bengali borders.",
+                image: "🥻",
+                genders: ["women", "girl"],
+                occasions: ["casual", "festival", "formal"],
+                season: ["summer", "monsoon"],
+                sparkleText: "Bengali elegance!",
+                tags: ["casual", "traditional"]
+            },
+            {
+                name: "Rajasthani Ghagra Choli",
+                state: "Rajasthan",
+                region: "West India",
+                description: "Vibrant mirror-work ghagra with embroidered choli and dupatta.",
+                image: "👗",
+                genders: ["women", "girl"],
+                occasions: ["festival", "wedding", "traditional"],
+                season: ["winter", "spring"],
+                sparkleText: "Royal Rajasthani charm!",
+                tags: ["festival", "wedding"]
+            },
+            {
+                name: "South Indian Mundu",
+                state: "Kerala",
+                region: "South India",
+                description: "Traditional white cotton mundu with golden border and shirt.",
+                image: "👔",
+                genders: ["men", "boy"],
+                occasions: ["traditional", "formal", "festival"],
+                season: ["summer", "monsoon"],
+                sparkleText: "South Indian sophistication!",
+                tags: ["traditional", "formal"]
+            },
+            {
+                name: "Manipuri Phanek",
+                state: "Manipur",
+                region: "Northeast India",
+                description: "Traditional wraparound skirt with beautiful shawl.",
+                image: "🥻",
+                genders: ["women", "girl"],
+                occasions: ["traditional", "festival", "casual"],
+                season: ["winter", "spring"],
+                sparkleText: "Manipuri grace!",
+                tags: ["traditional", "festival"]
+            }
+        ];
+
+        function getRecommendations() {
+            const gender = document.getElementById('genderFilter').value;
+            const occasion = document.getElementById('occasionFilter').value;
+            const region = document.getElementById('regionFilter').value;
+            const season = document.getElementById('seasonFilter').value;
+
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('recommendationsSection').style.display = 'none';
+            document.getElementById('noRecommendations').classList.remove('show');
+
+            // Simulate API call delay
+            setTimeout(() => {
+                const recommendations = filterOutfits(gender, occasion, region, season);
+                displayRecommendations(recommendations);
+                
+                // Hide loading
+                document.getElementById('loading').classList.remove('show');
+            }, 1500);
+        }
+
+        function filterOutfits(gender, occasion, region, season) {
+            return outfitDatabase.filter(outfit => {
+                // Gender filter
+                if (gender && !outfit.genders.includes(gender)) return false;
+                
+                // Occasion filter
+                if (occasion && !outfit.occasions.includes(occasion)) return false;
+                
+                // Region filter
+                if (region && outfit.region !== region) return false;
+                
+                // Season filter
+                if (season && !outfit.season.includes(season)) return false;
+                
+                return true;
+            });
+        }
+
+        function displayRecommendations(recommendations) {
+            const grid = document.getElementById('recommendationsGrid');
+            const section = document.getElementById('recommendationsSection');
+            const noResults = document.getElementById('noRecommendations');
+
+            if (recommendations.length === 0) {
+                section.style.display = 'none';
+                noResults.classList.add('show');
+                return;
+            }
+
+            // Clear previous recommendations
+            grid.innerHTML = '';
+            
+            // Show section
+            section.style.display = 'block';
+            noResults.classList.remove('show');
+
+            recommendations.forEach((outfit, index) => {
+                const card = createOutfitCard(outfit, index);
+                grid.appendChild(card);
+            });
+        }
+
+        function createOutfitCard(outfit, index) {
+            const card = document.createElement('div');
+            card.className = 'outfit-card';
+            card.style.animationDelay = `${index * 0.1}s`;
+
+            const tagsHTML = outfit.tags.map(tag => 
+                `<span class="tag ${tag}">${tag.charAt(0).toUpperCase() + tag.slice(1)}</span>`
+            ).join('');
+
+            card.innerHTML = `
+                <div class="outfit-image-container">
+                    <div class="outfit-emoji">${outfit.image}</div>
+                    <div class="outfit-badge">${outfit.state}</div>
+                </div>
+                <div class="outfit-content">
+                    <h3 class="outfit-name">${outfit.name}</h3>
+                    <p class="outfit-state">${outfit.region}</p>
+                    <p class="outfit-description">${outfit.description}</p>
+                    <div class="sparkle-text">
+                        <span>✨</span>
+                        <span>${outfit.sparkleText}</span>
+                    </div>
+                    <div class="outfit-tags">
+                        ${tagsHTML}
+                    </div>
+                    <button class="try-outfit-btn" onclick="tryOutfit('${outfit.name}', '${outfit.state}')">
+                        Try This Outfit
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function tryOutfit(outfitName, state) {
+            alert(`Great choice! You selected "${outfitName}" from ${state}. This feature will be available soon to virtually try on outfits!`);
+        }
+
+        // Auto-recommend based on current season
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentMonth = new Date().getMonth() + 1;
+            let currentSeason;
+            
+            if (currentMonth >= 3 && currentMonth <= 5) currentSeason = 'spring';
+            else if (currentMonth >= 6 && currentMonth <= 8) currentSeason = 'summer';
+            else if (currentMonth >= 9 && currentMonth <= 11) currentSeason = 'monsoon';
+            else currentSeason = 'winter';
+            
+            document.getElementById('seasonFilter').value = currentSeason;
+        });
+    </script>
+</body>
+</html>

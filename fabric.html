@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fabric Estimator</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #e8d5f2 0%, #d4b3e8 50%, #c49ad9 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header-fixed {
+      position: sticky;
+      top: 0;
+      background: transparent;
+      z-index: 100;
+      padding: 20px 0;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .header-fixed h1 {
+      color: #6b2c91;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0 0 20px 0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .button-group button {
+      padding: 15px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      background: rgba(255, 255, 255, 0.3);
+      color: #6b2c91;
+      cursor: pointer;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 2px solid transparent;
+    }
+
+    .button-group button:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.2);
+    }
+
+    .button-group button.active {
+      background: #6b2c91;
+      color: white;
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.3);
+    }
+
+    #cameraSection, #manualSection, #uploadSection {
+      display: none;
+      padding: 2rem 0;
+      min-height: 70vh;
+    }
+
+    #manualSection {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(107, 44, 145, 0.1);
+      margin: 20px 0;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 100%;
+      margin: 0;
+      gap: 20px;
+    }
+
+    form label {
+      font-weight: 600;
+      color: #6b2c91;
+      font-size: 16px;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    form input, form select {
+      padding: 15px 20px;
+      font-size: 16px;
+      border: 2px solid rgba(107, 44, 145, 0.2);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    form input:focus, form select:focus {
+      outline: none;
+      border-color: #6b2c91;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(107, 44, 145, 0.1);
+    }
+
+    form input::placeholder {
+      color: #999;
+      font-style: italic;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    form button {
+      padding: 18px 30px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      background: linear-gradient(135deg, #6b2c91 0%, #8a4bb8 100%);
+      color: white;
+      cursor: pointer;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.3);
+    }
+
+    form button:hover {
+      background: linear-gradient(135deg, #5a2478 0%, #7a3fa5 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 44, 145, 0.4);
+    }
+
+    #fabricResult {
+      font-weight: bold;
+      margin-top: 1rem;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      color: #6b2c91;
+      font-size: 18px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.1);
+    }
+
+    /* Camera specific styles */
+    .camera-container {
+      position: relative;
+      display: inline-block;
+      margin: 1rem 0;
+    }
+
+    #video {
+      border: 3px solid #6b2c91;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(107, 44, 145, 0.2);
+    }
+
+    .pose-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      border-radius: 15px;
+    }
+
+    .instruction {
+      background: rgba(107, 44, 145, 0.9);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 25px;
+      margin: 15px 0;
+      font-weight: 600;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.3);
+    }
+
+    .countdown {
+      font-size: 2.5rem;
+      color: #6b2c91;
+      font-weight: bold;
+      margin: 15px 0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .measurement-summary {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #6b2c91;
+      border-radius: 20px;
+      padding: 25px;
+      margin: 25px auto;
+      max-width: 500px;
+      text-align: left;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(107, 44, 145, 0.15);
+    }
+
+    .measurement-summary h3 {
+      color: #6b2c91;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+    }
+
+    .measurement-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(107, 44, 145, 0.2);
+      font-size: 16px;
+    }
+
+    .measurement-item:last-child {
+      border-bottom: none;
+    }
+
+    .fabric-result {
+      background: linear-gradient(135deg, #6b2c91 0%, #8a4bb8 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.3);
+    }
+
+    .status-indicator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #dc3545;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .status-indicator.stable {
+      background: #28a745;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    #cameraSection {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    #uploadSection {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(107, 44, 145, 0.1);
+    }
+
+    #uploadSection input[type="file"] {
+      margin: 20px 0;
+      padding: 15px;
+      border: 2px dashed #6b2c91;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #6b2c91;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #uploadedPreview {
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(107, 44, 145, 0.2);
+      border: 3px solid #6b2c91;
+    }
+
+    /* Processing indicator for upload */
+    .processing-indicator {
+      background: rgba(107, 44, 145, 0.9);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 25px;
+      margin: 15px 0;
+      font-weight: 600;
+      display: none;
+      box-shadow: 0 4px 15px rgba(107, 44, 145, 0.3);
+    }
+
+    .processing-indicator.show {
+      display: inline-block;
+    }
+
+    /* Hidden canvas for image processing */
+    #uploadCanvas {
+      display: none;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .button-group button {
+        width: 200px;
+        margin: 5px 0;
+      }
+      
+      .header-fixed h1 {
+        font-size: 2rem;
+      }
+      
+      #video {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+      }
+    }
+  </style>
+  <!-- MediaPipe Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header-fixed">
+      <h1>Fabric Estimator</h1>
+      <div class="button-group">
+        <button id="manualBtn" onclick="showManual()">Manual Entry</button>
+        <button id="cameraBtn" onclick="showCamera()">Use Camera</button>
+        <button id="uploadBtn" onclick="showUpload()">Upload Image</button>
+      </div>
+    </div>
+
+    <!-- Manual Entry Section -->
+    <div id="manualSection">
+      <form id="fabricForm">
+        <div class="form-group">
+          <label for="height">Height (cm)</label>
+          <input type="number" id="height" placeholder="Enter your height in centimeters" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="chest">Chest (cm)</label>
+          <input type="number" id="chest" placeholder="Enter your chest measurement" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="width">Waist (cm)</label>
+          <input type="number" id="width" placeholder="Enter your waist measurement" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="shoulder">Shoulder (cm)</label>
+          <input type="number" id="shoulder" placeholder="Enter your shoulder width" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="hip">Hip (cm)</label>
+          <input type="number" id="hip" placeholder="Enter your hip measurement" required>
+        </div>
+
+        <div class="form-group">
+          <label for="garment">Garment Type</label>
+          <select id="garment">
+            <option value="kurti">Kurthi</option>
+            <option value="shirt">Shirt</option>
+            <option value="blouse">Blouse</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sleeves">Sleeve Type</label>
+          <select id="sleeves">
+            <option value="none">No Sleeves</option>
+            <option value="half">Half Sleeves</option>
+            <option value="full">Full Sleeves</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fit">Fit Type</label>
+          <select id="fit">
+            <option value="regular">Regular Fit</option>
+            <option value="loose">Loose Fit</option>
+            <option value="tight">Tight Fit</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="estimateFabric()">Estimate Fabric</button>
+      </form>
+      <div id="fabricResult"></div>
+    </div>
+
+    <!-- Use Camera Section -->
+    <div id="cameraSection">
+      <div class="instruction" id="cameraInstruction">
+        📷 Please stand in front of the camera with your full body visible and stay still
+      </div>
+      
+      <div class="camera-container">
+        <video id="video" width="640" height="480" autoplay></video>
+        <canvas id="poseCanvas" class="pose-overlay" width="640" height="480"></canvas>
+        <div class="status-indicator" id="statusIndicator"></div>
+      </div>
+      
+      <div class="countdown" id="countdown" style="display: none;"></div>
+      
+      <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+      
+      <div id="cameraMeasurements" style="display: none;"></div>
+    </div>
+
+    <!-- Upload Image Section -->
+    <div id="uploadSection">
+      <h2 style="color: #6b2c91; margin-bottom: 20px;">Upload Your Image</h2>
+      <input type="file" accept="image/*" onchange="handleImageUpload(event)">
+      <br>
+      <img id="uploadedPreview" style="margin-top:1rem; max-width:300px; display:none;" />
+      
+      <div class="processing-indicator" id="processingIndicator">
+        🔄 Processing your image... Please wait
+      </div>
+      
+      <canvas id="uploadCanvas" width="640" height="480"></canvas>
+      
+      <div id="uploadMeasurements" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables for pose detection
+    let pose = null;
+    let camera = null;
+    let poseStable = false;
+    let stableStartTime = 0;
+    let countdownInterval = null;
+    let measurementsTaken = false;
+    let lastPoseData = null;
+    let uploadPose = null; // Separate pose instance for uploaded images
+
+    function stopCamera() {
+      const video = document.getElementById("video");
+      const stream = video.srcObject;
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+      }
+      
+      // Stop pose detection
+      if (pose) {
+        pose.close();
+        pose = null;
+      }
+      if (camera) {
+        camera.stop();
+        camera = null;
+      }
+      
+      // Clear intervals
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      
+      // Reset states
+      poseStable = false;
+      measurementsTaken = false;
+      document.getElementById("countdown").style.display = "none";
+      document.getElementById("statusIndicator").classList.remove("stable");
+    }
+
+    function showManual() {
+      stopCamera();
+      // Update button states
+      updateButtonStates('manualBtn');
+      // Show section
+      document.getElementById("manualSection").style.display = "block";
+      document.getElementById("cameraSection").style.display = "none";
+      document.getElementById("uploadSection").style.display = "none";
+    }
+
+    function showCamera() {
+      stopCamera();
+      // Update button states
+      updateButtonStates('cameraBtn');
+      // Show section
+      document.getElementById("cameraSection").style.display = "block";
+      document.getElementById("manualSection").style.display = "none";
+      document.getElementById("uploadSection").style.display = "none";
+      document.getElementById("cameraMeasurements").style.display = "none";
+      
+      initializePoseDetection();
+    }
+
+    function showUpload() {
+      stopCamera();
+      // Update button states
+      updateButtonStates('uploadBtn');
+      // Show section
+      document.getElementById("uploadSection").style.display = "block";
+      document.getElementById("cameraSection").style.display = "none";
+      document.getElementById("manualSection").style.display = "none";
+      // Reset upload section
+      document.getElementById("uploadMeasurements").style.display = "none";
+      document.getElementById("processingIndicator").classList.remove("show");
+    }
+
+    function updateButtonStates(activeId) {
+      // Remove active class from all buttons
+      document.querySelectorAll('.button-group button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // Add active class to clicked button
+      document.getElementById(activeId).classList.add('active');
+    }
+
+    function initializePoseDetection() {
+      const video = document.getElementById("video");
+      const canvasElement = document.getElementById("poseCanvas");
+      const canvasCtx = canvasElement.getContext('2d');
+
+      pose = new Pose({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }
+      });
+
+      pose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        smoothSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      });
+
+      pose.onResults(onPoseResults);
+
+      camera = new Camera(video, {
+        onFrame: async () => {
+          await pose.send({image: video});
+        },
+        width: 640,
+        height: 480
+      });
+
+      camera.start();
+    }
+
+    function initializeUploadPoseDetection() {
+      if (uploadPose) {
+        uploadPose.close();
+      }
+
+      uploadPose = new Pose({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }
+      });
+
+      uploadPose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        smoothSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      });
+
+      uploadPose.onResults(onUploadPoseResults);
+    }
+
+    function onPoseResults(results) {
+      const canvasElement = document.getElementById("poseCanvas");
+      const canvasCtx = canvasElement.getContext('2d');
+      const video = document.getElementById("video");
+
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.poseLandmarks) {
+        // Draw pose landmarks
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
+        drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#FF0000', lineWidth: 2});
+
+        // Check if pose is stable and complete
+        checkPoseStability(results.poseLandmarks);
+        
+        // Store pose data for measurement calculation
+        lastPoseData = results.poseLandmarks;
+      }
+
+      canvasCtx.restore();
+    }
+
+    function onUploadPoseResults(results) {
+      document.getElementById("processingIndicator").classList.remove("show");
+      
+      if (results.poseLandmarks) {
+        // Calculate measurements from uploaded image pose data
+        const measurements = calculateMeasurements(results.poseLandmarks);
+        displayUploadMeasurements(measurements);
+      } else {
+        // No pose detected in uploaded image
+        document.getElementById("uploadMeasurements").innerHTML = `
+          <div class="measurement-summary">
+            <h3>❌ No Pose Detected</h3>
+            <p style="text-align: center; color: #666;">
+              We couldn't detect a full body pose in your uploaded image. 
+              Please try uploading an image where:
+            </p>
+            <ul style="text-align: left; color: #666; margin: 15px 0;">
+              <li>Your full body is visible</li>
+              <li>You're standing upright</li>
+              <li>The image is clear and well-lit</li>
+              <li>There's good contrast between you and the background</li>
+            </ul>
+          </div>
+        `;
+        document.getElementById("uploadMeasurements").style.display = "block";
+      }
+    }
+
+    function checkPoseStability(landmarks) {
+      // Check if all key landmarks are visible
+      const keyPoints = [0, 11, 12, 23, 24]; // nose, shoulders, hips
+      const allVisible = keyPoints.every(index => 
+        landmarks[index] && landmarks[index].visibility > 0.7
+      );
+
+      if (allVisible && !measurementsTaken) {
+        if (!poseStable) {
+          poseStable = true;
+          stableStartTime = Date.now();
+          document.getElementById("statusIndicator").classList.add("stable");
+          document.getElementById("cameraInstruction").innerHTML = "✅ Perfect! Stay still for 3 seconds...";
+          startCountdown();
+        }
+      } else {
+        if (poseStable && !measurementsTaken) {
+          poseStable = false;
+          document.getElementById("statusIndicator").classList.remove("stable");
+          document.getElementById("cameraInstruction").innerHTML = "📷 Please stand in front of the camera with your full body visible and stay still";
+          stopCountdown();
+        }
+      }
+    }
+
+    function startCountdown() {
+      let count = 3;
+      const countdownEl = document.getElementById("countdown");
+      countdownEl.style.display = "block";
+      countdownEl.textContent = count;
+
+      countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownEl.textContent = count;
+        } else {
+          countdownEl.textContent = "Capturing...";
+          setTimeout(() => {
+            capturePoseImage();
+            stopCountdown();
+          }, 500);
+        }
+      }, 1000);
+    }
+
+    function stopCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      document.getElementById("countdown").style.display = "none";
+    }
+
+    function capturePoseImage() {
+      if (!lastPoseData) return;
+
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Calculate measurements from pose data
+      const measurements = calculateMeasurements(lastPoseData);
+      displayMeasurements(measurements);
+      
+      measurementsTaken = true;
+      document.getElementById("cameraInstruction").innerHTML = "✅ Measurements captured successfully! Check results below.";
+      document.getElementById("statusIndicator").classList.remove("stable");
+    }
+
+    function calculateMeasurements(landmarks) {
+      // Calculate measurements based on pose landmarks
+      // These are approximations based on pose ratios and average human proportions
+      
+      const nose = landmarks[0];
+      const leftShoulder = landmarks[11];
+      const rightShoulder = landmarks[12];
+      const leftHip = landmarks[23];
+      const rightHip = landmarks[24];
+      const leftAnkle = landmarks[27];
+      const rightAnkle = landmarks[28];
+
+      // Calculate pixel distances
+      const shoulderWidth = Math.abs(rightShoulder.x - leftShoulder.x) * 640;
+      const bodyHeight = Math.abs(nose.y - ((leftAnkle.y + rightAnkle.y) / 2)) * 480;
+      const hipWidth = Math.abs(rightHip.x - leftHip.x) * 640;
+      const torsoLength = Math.abs(((leftShoulder.y + rightShoulder.y) / 2) - ((leftHip.y + rightHip.y) / 2)) * 480;
+
+      // Convert to approximate real measurements (these are estimates)
+      // Assuming average shoulder width is 45cm, we can scale other measurements
+      const scaleFactor = 45 / shoulderWidth;
+      
+      return {
+        height: Math.round(bodyHeight * scaleFactor),
+        chest: Math.round(shoulderWidth * scaleFactor * 2.2), // Chest is typically 2.2x shoulder width
+        width: Math.round(hipWidth * scaleFactor * 1.8), // Approximate waist
+        shoulder: Math.round(shoulderWidth * scaleFactor),
+        hip: Math.round(hipWidth * scaleFactor * 2.1)
+      };
+    }
+
+    function displayMeasurements(measurements) {
+      const measurementsDiv = document.getElementById("cameraMeasurements");
+      
+      // Calculate fabric requirement
+      const sleeves = "half"; // Default for camera detection
+      const fit = "regular"; // Default for camera detection
+      const garment = "kurti"; // Default for camera detection
+      
+      let base = measurements.height + measurements.chest + measurements.width + measurements.shoulder + measurements.hip;
+      let extra = 0;
+
+      if (sleeves === "full") extra += 40;
+      if (sleeves === "half") extra += 20;
+      if (fit === "loose") extra += 30;
+
+      const total = (base + extra) / 100;
+      const meters = total.toFixed(2);
+
+      measurementsDiv.innerHTML = `
+        <div class="measurement-summary">
+          <h3>📏 Your Body Measurements</h3>
+          <div class="measurement-item">
+            <span><strong>Height (cm):</strong></span>
+            <span>${measurements.height} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Chest (cm):</strong></span>
+            <span>${measurements.chest} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Waist (cm):</strong></span>
+            <span>${measurements.width} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Shoulder (cm):</strong></span>
+            <span>${measurements.shoulder} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Hip (cm):</strong></span>
+            <span>${measurements.hip} cm</span>
+          </div>
+          
+          <div class="fabric-result">
+            🧵 Estimated Fabric Required: <strong>${meters} meters</strong>
+            <br><small>For ${garment} with ${sleeves} sleeves (${fit} fit)</small>
+          </div>
+          
+          <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
+            <em>*AI-powered measurements. Results may vary based on camera angle and lighting.</em>
+          </p>
+        </div>
+      `;
+      
+      measurementsDiv.style.display = "block";
+    }
+
+    function displayUploadMeasurements(measurements) {
+      const measurementsDiv = document.getElementById("uploadMeasurements");
+      
+      // Calculate fabric requirement
+      const sleeves = "half"; // Default for uploaded images
+      const fit = "regular"; // Default for uploaded images
+      const garment = "kurti"; // Default for uploaded images
+      
+      let base = measurements.height + measurements.chest + measurements.width + measurements.shoulder + measurements.hip;
+      let extra = 0;
+
+      if (sleeves === "full") extra += 40;
+      if (sleeves === "half") extra += 20;
+      if (fit === "loose") extra += 30;
+
+      const total = (base + extra) / 100;
+      const meters = total.toFixed(2);
+
+      measurementsDiv.innerHTML = `
+        <div class="measurement-summary">
+          <h3>📏 Detected Body Measurements</h3>
+          <div class="measurement-item">
+            <span><strong>Height (cm):</strong></span>
+            <span>${measurements.height} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Chest (cm):</strong></span>
+            <span>${measurements.chest} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Waist (cm):</strong></span>
+            <span>${measurements.width} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Shoulder (cm):</strong></span>
+            <span>${measurements.shoulder} cm</span>
+          </div>
+          <div class="measurement-item">
+            <span><strong>Hip (cm):</strong></span>
+            <span>${measurements.hip} cm</span>
+          </div>
+          
+          <div class="fabric-result">
+            🧵 Estimated Fabric Required: <strong>${meters} meters</strong>
+            <br><small>For ${garment} with ${sleeves} sleeves (${fit} fit)</small>
+          </div>
+          
+          <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
+            <em>*AI-powered measurements from uploaded image. Results may vary based on image quality and pose.</em>
+          </p>
+        </div>
+      `;
+      
+      measurementsDiv.style.display = "block";
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Show processing indicator
+      document.getElementById("processingIndicator").classList.add("show");
+      document.getElementById("uploadMeasurements").style.display = "none";
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById("uploadedPreview");
+        img.src = e.target.result;
+        img.style.display = "block";
+
+        // Create a new image element for processing
+        const imageElement = new Image();
+        imageElement.onload = function() {
+          // Draw image to canvas for processing
+          const canvas = document.getElementById("uploadCanvas");
+          const ctx = canvas.getContext("2d");
+          
+          // Calculate dimensions to fit image in canvas while maintaining aspect ratio
+          const maxWidth = 640;
+          const maxHeight = 480;
+          let { width, height } = imageElement;
+          
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(imageElement, 0, 0, width, height);
+          
+          // Initialize pose detection for uploaded image
+          initializeUploadPoseDetection();
+          
+          // Process the image through MediaPipe Pose
+          setTimeout(() => {
+            uploadPose.send({image: imageElement});
+          }, 1000);
+        };
+        
+        imageElement.src = e.target.result;
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
+    function captureImage() {
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.style.display = "block";
+    }
+
+    function estimateFabric() {
+      const height = parseFloat(document.getElementById("height").value);
+      const chest = parseFloat(document.getElementById("chest").value);
+      const width = parseFloat(document.getElementById("width").value);
+      const shoulder = parseFloat(document.getElementById("shoulder").value);
+      const hip = parseFloat(document.getElementById("hip").value);
+      const sleeves = document.getElementById("sleeves").value;
+      const fit = document.getElementById("fit").value;
+
+      let base = height + chest + width + shoulder + hip;
+      let extra = 0;
+
+      if (sleeves === "full") extra += 40;
+      if (sleeves === "half") extra += 20;
+      if (fit === "loose") extra += 30;
+
+      const total = (base + extra) / 100;
+      const meters = total.toFixed(2);
+
+      document.getElementById("fabricResult").innerText = `Estimated Fabric Required: ${meters} meters`;
+    }
+
+    // Initialize with Manual Entry section visible
+    document.addEventListener('DOMContentLoaded', function() {
+      showManual();
+    });
+  </script>
+</body>
+</html>

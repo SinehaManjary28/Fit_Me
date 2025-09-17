@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore by State - Traditional Indian Outfits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f8f4e6 0%, #fff9e6 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #6a1b9a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(106, 27, 154, 0.3);
+        }
+
+        .back-btn:hover {
+            background: #4a148c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(106, 27, 154, 0.3);
+        }
+
+        .header h1 {
+            color: #6a1b9a;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #9c27b0;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #6a1b9a;
+            box-shadow: 0 0 10px rgba(106, 27, 154, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9c27b0;
+            font-size: 1.2rem;
+        }
+
+        .category-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .category-btn.active {
+            background: #6a1b9a;
+        }
+
+        .category-btn:not(.active) {
+            background: #9c27b0;
+        }
+
+        .category-btn:hover {
+            background: #6a1b9a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .state-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .state-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(106, 27, 154, 0.2);
+        }
+
+        .state-card.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            display: none;
+        }
+
+        .state-header {
+            background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .state-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .state-region {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .outfits-container {
+            padding: 20px;
+        }
+
+        .outfit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .outfit-item:hover {
+            background: #f0f0f0;
+        }
+
+        .outfit-item.hidden {
+            display: none;
+        }
+
+        .outfit-image {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 15px;
+            border: 2px solid #9c27b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #6a1b9a;
+            font-weight: bold;
+        }
+
+        .outfit-info {
+            flex-grow: 1;
+        }
+
+        .outfit-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #6a1b9a;
+            margin-bottom: 5px;
+        }
+
+        .outfit-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .gender-tags {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .gender-tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .gender-tag.men { background: #6a1b9a; }
+        .gender-tag.women { background: #9c27b0; }
+        .gender-tag.boy { background: #8e24aa; }
+        .gender-tag.girl { background: #ab47bc; }
+
+        .try-btn {
+            background: linear-gradient(135deg, #6a1b9a, #9c27b0);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 5px;
+        }
+
+        .try-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+
+        .no-results h3 {
+            color: #6a1b9a;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .states-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-buttons {
+                justify-content: center;
+            }
+
+            .category-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                ← Back to Home
+            </a>
+            <h1>Explore Traditional Outfits by State</h1>
+            <p>Discover the rich cultural heritage of India through traditional clothing from all 28 states and 8 union territories</p>
+        </div>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search states..." id="searchInput">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <div class="category-buttons">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="men">Men</button>
+            <button class="category-btn" data-category="women">Women</button>
+            <button class="category-btn" data-category="boy">Boy</button>
+            <button class="category-btn" data-category="girl">Girl</button>
+        </div>
+
+        <div class="states-grid" id="statesGrid">
+            <!-- States will be populated by JavaScript -->
+        </div>
+
+        <div class="no-results" id="noResults">
+            <h3>No states found</h3>
+            <p>Try searching with different keywords</p>
+        </div>
+    </div>
+
+    <script>
+        const statesData = [
+            {
+                name: "Andhra Pradesh",
+                region: "South India",
+                outfits: [
+                    {
+                        name: "Panche & Angi",
+                        description: "Traditional dhoti with shirt for men.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Pochampally Saree",
+                        description: "Traditional handwoven silk saree with geometric patterns.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Arunachal Pradesh",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Wrap Robe",
+                        description: "Woolen robes with tribal belts and headbands.",
+                        image: "🥻",
+                        genders: ["men", "women", "boy", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Assam",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Dhoti & Chadar",
+                        description: "Traditional white dhoti with black Gamosa.",
+                        image: "👕",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Mekhela Chadar",
+                        description: "Traditional Assamese two-piece silk attire.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Bihar",
+                region: "East India",
+                outfits: [
+                    {
+                        name: "Dhoti Kurta",
+                        description: "Simple white cotton dhoti with kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Tussar Silk Saree",
+                        description: "Traditional silk saree with simple borders.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Chhattisgarh",
+                region: "Central India",
+                outfits: [
+                    {
+                        name: "Dhoti & Bandi",
+                        description: "Traditional dhoti with embroidered jacket.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Lugda",
+                        description: "Traditional draped saree without blouse.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Goa",
+                region: "West India",
+                outfits: [
+                    {
+                        name: "Shirt & Trouser",
+                        description: "Portuguese-influenced formal wear.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Kashti Saree",
+                        description: "Nine-yard saree worn without petticoat.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Gujarat",
+                region: "West India",
+                outfits: [
+                    {
+                        name: "Kediya & Dhoti",
+                        description: "Traditional short kurta with dhoti.",
+                        image: "👕",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Chaniya Choli",
+                        description: "Colorful flared skirt with fitted blouse.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Haryana",
+                region: "North India",
+                outfits: [
+                    {
+                        name: "Kurta Pajama",
+                        description: "Cotton kurta with loose pajama.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Ghagra Choli",
+                        description: "Vibrant skirt with embroidered blouse.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Himachal Pradesh",
+                region: "North India",
+                outfits: [
+                    {
+                        name: "Chola & Suthan",
+                        description: "Traditional kurta with tight pajama.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Choli & Ghagra",
+                        description: "Woolen blouse with full skirt.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Jharkhand",
+                region: "East India",
+                outfits: [
+                    {
+                        name: "Dhoti & Kurta",
+                        description: "Simple cotton dhoti with kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Saree",
+                        description: "Traditional cotton saree with tribal patterns.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Karnataka",
+                region: "South India",
+                outfits: [
+                    {
+                        name: "Panche & Angi",
+                        description: "Traditional lungi with shirt.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Ilkal Saree",
+                        description: "Traditional handwoven cotton-silk saree.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Kerala",
+                region: "South India",
+                outfits: [
+                    {
+                        name: "Mundu & Shirt",
+                        description: "White cotton mundu with shirt.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Kasavu Saree",
+                        description: "Cream saree with golden border.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Madhya Pradesh",
+                region: "Central India",
+                outfits: [
+                    {
+                        name: "Dhoti & Kurta",
+                        description: "Simple cotton dhoti with kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Lehenga Choli",
+                        description: "Traditional skirt with blouse.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Maharashtra",
+                region: "West India",
+                outfits: [
+                    {
+                        name: "Dhoti & Pheta",
+                        description: "Traditional dhoti with turban.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Nauvari Saree",
+                        description: "Nine-yard saree draped like dhoti.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Manipur",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Dhoti & Shirt",
+                        description: "White dhoti with traditional shirt.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Phanek & Innaphi",
+                        description: "Traditional wraparound skirt with shawl.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Meghalaya",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Jymphong",
+                        description: "Traditional coat with sleeveless waistcoat.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Jainsem",
+                        description: "Traditional cylindrical dress with no sleeves.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Mizoram",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Shirt & Trouser",
+                        description: "Simple shirt with traditional trouser.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Puanchei",
+                        description: "Traditional dress with geometric patterns.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Nagaland",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Warrior Outfit",
+                        description: "Traditional warrior dress with accessories.",
+                        image: "🛡",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Traditional Dress",
+                        description: "Colorful traditional dress with tribal patterns.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Odisha",
+                region: "East India",
+                outfits: [
+                    {
+                        name: "Dhoti & Kurta",
+                        description: "White cotton dhoti with kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Sambalpuri Saree",
+                        description: "Traditional handwoven saree with ikat patterns.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Punjab",
+                region: "North India",
+                outfits: [
+                    {
+                        name: "Kurta Pajama & Turban",
+                        description: "Cotton kurta with pajama and colorful turban.",
+                        image: "👳",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Salwar Kameez",
+                        description: "Traditional three-piece suit with dupatta.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Rajasthan",
+                region: "West India",
+                outfits: [
+                    {
+                        name: "Dhoti & Angarkha",
+                        description: "Traditional dhoti with royal coat.",
+                        image: "🤴",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Ghagra Choli",
+                        description: "Colorful flared skirt with embroidered blouse.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Sikkim",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Bakhu",
+                        description: "Traditional loose robe worn by men.",
+                        image: "🥻",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Honju",
+                        description: "Traditional dress worn with apron-like garment.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Tamil Nadu",
+                region: "South India",
+                outfits: [
+                    {
+                        name: "Vetti & Shirt",
+                        description: "Traditional dhoti with shirt.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Kanchipuram Saree",
+                        description: "Silk saree with golden zari work.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Telangana",
+                region: "South India",
+                outfits: [
+                    {
+                        name: "Panche & Kurta",
+                        description: "Traditional lungi with kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Pochampally Saree",
+                        description: "Traditional handwoven silk saree.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Tripura",
+                region: "Northeast India",
+                outfits: [
+                    {
+                        name: "Kubai",
+                        description: "Traditional male garment with geometric patterns.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Rignai",
+                        description: "Traditional female dress with colorful patterns.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Uttar Pradesh",
+                region: "North India",
+                outfits: [
+                    {
+                        name: "Kurta Pajama",
+                        description: "Cotton kurta with loose pajama.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Lehenga Choli",
+                        description: "Traditional skirt with embroidered blouse.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Uttarakhand",
+                region: "North India",
+                outfits: [
+                    {
+                        name: "Dhoti Kurta",
+                        description: "Traditional dhoti with woolen kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Ghagra Choli",
+                        description: "Woolen skirt with embroidered blouse.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "West Bengal",
+                region: "East India",
+                outfits: [
+                    {
+                        name: "Dhoti & Panjabi",
+                        description: "White dhoti with traditional kurta.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Tant Saree",
+                        description: "Traditional handwoven cotton saree.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            // Union Territories
+            {
+                name: "Andaman and Nicobar Islands",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Casual Shirt",
+                        description: "Light cotton shirt suitable for island climate.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Cotton Saree",
+                        description: "Light cotton saree suitable for tropical climate.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Chandigarh",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Kurta Pajama",
+                        description: "Modern kurta with comfortable pajama.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Salwar Kameez",
+                        description: "Traditional Punjabi suit with dupatta.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Dadra and Nagar Haveli and Daman and Diu",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Shirt & Dhoti",
+                        description: "Simple shirt with traditional dhoti.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Saree",
+                        description: "Traditional cotton saree with simple borders.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Delhi",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Kurta Pajama",
+                        description: "Elegant kurta with comfortable pajama.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Salwar Kameez",
+                        description: "Traditional North Indian suit.",
+                        image: "👗",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Jammu and Kashmir",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Pheran",
+                        description: "Traditional woolen robe for cold weather.",
+                        image: "🧥",
+                        genders: ["men", "women", "boy", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Ladakh",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Gonchas",
+                        description: "Traditional woolen robe with belt.",
+                        image: "🧥",
+                        genders: ["men", "women", "boy", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Lakshadweep",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Mundu & Shirt",
+                        description: "Light cotton mundu with shirt for island climate.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Saree",
+                        description: "Light cotton saree suitable for coastal areas.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            },
+            {
+                name: "Puducherry",
+                region: "Union Territory",
+                outfits: [
+                    {
+                        name: "Vetti & Shirt",
+                        description: "Traditional South Indian dhoti with shirt.",
+                        image: "👔",
+                        genders: ["men", "boy"]
+                    },
+                    {
+                        name: "Saree",
+                        description: "Traditional Tamil-style cotton saree.",
+                        image: "🥻",
+                        genders: ["women", "girl"]
+                    }
+                ]
+            }
+        ];
+
+        let currentCategory = 'all';
+
+        // Initialize the page
+        function initializePage() {
+            renderStates();
+            setupEventListeners();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', handleSearch);
+
+            // Category buttons
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    categoryButtons.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    // Update current category
+                    currentCategory = this.dataset.category;
+                    // Filter and render states
+                    filterStates();
+                });
+            });
+        }
+
+        // Render states to the grid
+        function renderStates() {
+            const statesGrid = document.getElementById('statesGrid');
+            statesGrid.innerHTML = '';
+
+            statesData.forEach(state => {
+                const stateCard = createStateCard(state);
+                statesGrid.appendChild(stateCard);
+            });
+        }
+
+        // Create a state card element
+        function createStateCard(state) {
+            const card = document.createElement('div');
+            card.className = 'state-card';
+            card.dataset.stateName = state.name.toLowerCase();
+
+            // Create outfits HTML
+            const outfitsHTML = state.outfits.map(outfit => {
+                const genderTags = outfit.genders.map(gender => 
+                    `<span class="gender-tag ${gender}">${capitalizeFirst(gender)}</span>`
+                ).join('');
+
+                return `
+                    <div class="outfit-item" data-genders="${outfit.genders.join(',')}">
+                        <div class="outfit-image">${outfit.image}</div>
+                        <div class="outfit-info">
+                            <div class="outfit-name">${outfit.name}</div>
+                            <div class="outfit-description">${outfit.description}</div>
+                            <div class="gender-tags">${genderTags}</div>
+                            <button class="try-btn" onclick="tryOutfit('${outfit.name}', '${state.name}')">Try This Outfit</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            card.innerHTML = `
+                <div class="state-header">
+                    <div class="state-name">${state.name}</div>
+                    <div class="state-region">${state.region}</div>
+                </div>
+                <div class="outfits-container">
+                    ${outfitsHTML}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Handle search functionality
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const stateCards = document.querySelectorAll('.state-card');
+            let hasVisibleCards = false;
+
+            stateCards.forEach(card => {
+                const stateName = card.dataset.stateName;
+                const shouldShow = stateName.includes(searchTerm);
+                
+                if (shouldShow && categoryMatches(card)) {
+                    card.classList.remove('hidden');
+                    hasVisibleCards = true;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Show/hide no results message
+            const noResults = document.getElementById('noResults');
+            if (hasVisibleCards) {
+                noResults.classList.remove('show');
+            } else {
+                noResults.classList.add('show');
+            }
+        }
+
+        // Filter states based on current category
+        function filterStates() {
+            const stateCards = document.querySelectorAll('.state-card');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let hasVisibleCards = false;
+
+            stateCards.forEach(card => {
+                const stateName = card.dataset.stateName;
+                const matchesSearch = stateName.includes(searchTerm);
+                const matchesCategory = categoryMatches(card);
+                
+                if (matchesSearch && matchesCategory) {
+                    card.classList.remove('hidden');
+                    hasVisibleCards = true;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Show/hide no results message
+            const noResults = document.getElementById('noResults');
+            if (hasVisibleCards) {
+                noResults.classList.remove('show');
+            } else {
+                noResults.classList.add('show');
+            }
+        }
+
+        // Check if a state card matches the current category
+        function categoryMatches(card) {
+            if (currentCategory === 'all') {
+                return true;
+            }
+
+            const outfitItems = card.querySelectorAll('.outfit-item');
+            let hasMatchingOutfit = false;
+
+            outfitItems.forEach(item => {
+                const genders = item.dataset.genders.split(',');
+                if (genders.includes(currentCategory)) {
+                    item.classList.remove('hidden');
+                    hasMatchingOutfit = true;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            return hasMatchingOutfit;
+        }
+
+        // Capitalize first letter of a string
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Try outfit function
+        function tryOutfit(outfitName, stateName) {
+            alert(`Great choice! You selected "${outfitName}" from ${stateName}. This feature will be available soon to virtually try on outfits!`);
+        }
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
