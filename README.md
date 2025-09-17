@@ -1,5 +1,4 @@
-# FitMe: Stitch Smart. Dress Smarter. 👗✨
-
+# FitMe: Stitch Smart. Dress Smarter. 
 FitMe is a **fashion utility web application** that helps users plan, estimate, and personalize their outfits.  
 It provides interactive tools like a **Fabric Estimator**, **Outfit Recommender**, **Explore by State**, **Tailor Mode**, and a **Nearby Tailor Finder**, making it easier to stitch and style smarter.
 
